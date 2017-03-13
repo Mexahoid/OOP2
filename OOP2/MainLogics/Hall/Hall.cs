@@ -15,6 +15,7 @@ namespace OOP2
 
         public Hall(int ATMCount, int Threshold)
         {
+            _atms = new List<ATM>();
             for (int i = 0; i < ATMCount; i++)
             {
                 _atms.Add(new ATM(Threshold));

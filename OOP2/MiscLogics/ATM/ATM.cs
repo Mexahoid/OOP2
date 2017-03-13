@@ -26,11 +26,10 @@ namespace OOP2
         /// Минимальное значение суммы в банкомате.
         /// </summary>
         private int _threshold;
-
-        private ResponseCode _currentState;
-
+        
         public ATM(int Threshold)
         {
+            _clientQueue = new Queue<Client>();
             _threshold = Threshold;
             _mb = new MoneyBox();
         }

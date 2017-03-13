@@ -31,6 +31,7 @@ namespace OOP2
         /// </summary>
         public MoneyBox()
         {
+            _money = new List<NotesStack>();
             bool flag = false;
             _cash = 0;
             for (int i = 10; i <= 5000; i *= flag ? 5 : 2, flag = !flag)

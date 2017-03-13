@@ -24,6 +24,10 @@ namespace OOP2
         {
             Client.lb = (int)CtrlNUDLeftBoundary.Value;
             Client.rb = (int)CtrlNUDRightBoundary.Value;
+            if(_right && _left)
+            {
+
+            }
         }
 
         private void CtrlButStop_Click(object sender, EventArgs e)
