@@ -8,9 +8,12 @@ namespace OOP2
 {
     class Hall
     {
+        /// <summary>
+        /// Список банкоматов.
+        /// </summary>
         private List<ATM> _atms;
 
-        public Hall(int ATMCount, int Threshold, int LeftBoundary, int RightBoundary)
+        public Hall(int ATMCount, int Threshold)
         {
             for (int i = 0; i < ATMCount; i++)
             {

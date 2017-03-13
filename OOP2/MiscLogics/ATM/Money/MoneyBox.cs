@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace OOP2
 {
-
     /// <summary>
     /// Главный короб пачек с деньгами.
     /// </summary>

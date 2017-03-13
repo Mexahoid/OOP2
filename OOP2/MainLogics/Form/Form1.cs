@@ -22,7 +22,8 @@ namespace OOP2
 
         private void CtrlButStart_Click(object sender, EventArgs e)
         {
-
+            Client.lb = (int)CtrlNUDLeftBoundary.Value;
+            Client.rb = (int)CtrlNUDRightBoundary.Value;
         }
 
         private void CtrlButStop_Click(object sender, EventArgs e)
@@ -32,6 +33,8 @@ namespace OOP2
 
         private void CtrlNUDLeftBoundary_ValueChanged(object sender, EventArgs e)
         {
+            CtrlNUDRightBoundary.Minimum = CtrlNUDRightBoundary.Value;
+
             if (CtrlNUDRightBoundary.Value % 10 != 0)
             {
                 MessageBox.Show("Нельзя вводить цены, не кратные 10");

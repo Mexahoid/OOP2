@@ -2,15 +2,32 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OOP2
 {
+    /// <summary>
+    /// Класс банкомата.
+    /// </summary>
     class ATM
     {
+        /// <summary>
+        /// Очередь к этому банкомату.
+        /// </summary>
         private Queue<Client> _clientQueue;
+
+        /// <summary>
+        /// Главный короб с деньгами.
+        /// </summary>
         private MoneyBox _mb;
+
+        /// <summary>
+        /// Минимальное значение суммы в банкомате.
+        /// </summary>
         private int _threshold;
+
+        private ResponseCode _currentState;
 
         public ATM(int Threshold)
         {
@@ -25,6 +42,11 @@ namespace OOP2
         /// <returns>Возвращает код ответа.</returns>
         public ResponseCode OrderMoney(int Value)
         {
+            Thread.Sleep(1000);
+
+            if (_mb.Cash < _threshold)
+                return ResponseCode.Closed;
+
             int[] MoneyStacksCount = _mb.ReturnMoneyStackCount();
 
             //Начальное условие, можно ли набрать* всеми доступными купюрами
@@ -97,6 +119,15 @@ namespace OOP2
                 Value %= j;
             }
             return Value == 0;
+        }
+
+        /// <summary>
+        /// Метод для выдачи состояния 
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return _threshold > _mb.Cash ? "Закрыт." : _mb.Cash.ToString();
         }
 
     }
