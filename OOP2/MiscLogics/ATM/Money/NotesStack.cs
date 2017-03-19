@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace OOP2
 {
     /// <summary>
-    /// Пачка денег.
+    /// Класс пачки денег.
     /// </summary>
     public class NotesStack
     {
@@ -15,6 +15,7 @@ namespace OOP2
         /// Номинал купюр в пачке.
         /// </summary>
         private int _nominal;
+
         /// <summary>
         /// Список купюр.
         /// </summary>
@@ -25,6 +26,10 @@ namespace OOP2
         /// </summary>
         public int Nominal { get => _nominal; }
 
+        /// <summary>
+        /// Конструктор пачки денег.
+        /// </summary>
+        /// <param name="Nominal">Номинал купюр.</param>
         public NotesStack(int Nominal)
         {
             _nominal = Nominal;

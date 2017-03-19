@@ -24,6 +24,11 @@ namespace OOP2
         /// <summary>
         /// Клиент не получил деньги.
         /// </summary>
-        Bad
+        Bad,
+
+        /// <summary>
+        /// Только пришел.
+        /// </summary>
+        Fresh
     }
 }

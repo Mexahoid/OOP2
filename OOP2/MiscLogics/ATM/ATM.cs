@@ -13,25 +13,41 @@ namespace OOP2
     class ATM
     {
         /// <summary>
+        /// Минимальное значение суммы в банкомате.
+        /// </summary>
+        public static int threshold;
+
+        private bool _closed;
+
+        /// <summary>
         /// Очередь к этому банкомату.
         /// </summary>
         private Queue<Client> _clientQueue;
+
+        private event Action<bool> _queueUpdEvent;
 
         /// <summary>
         /// Главный короб с деньгами.
         /// </summary>
         private MoneyBox _mb;
 
+        public bool Closed
+        {
+            get
+            {
+                return _closed;
+            }
+        }
+
         /// <summary>
-        /// Минимальное значение суммы в банкомате.
+        /// Конструктор банкомата.
         /// </summary>
-        private int _threshold;
-        
-        public ATM(int Threshold)
+        public ATM(Action<bool> QueueEventHandler)
         {
             _clientQueue = new Queue<Client>();
-            _threshold = Threshold;
             _mb = new MoneyBox();
+            _closed = true;
+            _queueUpdEvent += QueueEventHandler;
         }
 
         /// <summary>
@@ -41,64 +57,71 @@ namespace OOP2
         /// <returns>Возвращает код ответа.</returns>
         public ResponseCode OrderMoney(int Value)
         {
-            Thread.Sleep(1000);
+            object Locker = new object();
+            lock (Locker)
+            {
+                Thread.Sleep(1000);
 
-            if (_mb.Cash < _threshold)
-                return ResponseCode.Closed;
-
-            int[] MoneyStacksCount = _mb.ReturnMoneyStackCount();
-
-            //Начальное условие, можно ли набрать* всеми доступными купюрами
-            if (!GetValueToNoteConversion(Value, out int[] DesireStacks))
-                return ResponseCode.TryToAbs;
-
-            //Если вообще не хватит денег на запрос
-            if (_mb.Cash < Value)
-                return ResponseCode.NotEnoughMoney;
-
-            //Иначе продолжаем выполнять
-            bool IsAvailable = true;
-            int Buffer = 0;
-            //Цикл просмотра допустимости набора присутствующими купюрами
-            int[] Nominals = new int[] { 10, 50, 100, 500, 1000, 5000 };
-            for (int i = 0; i < 6; i++)
-                if (MoneyStacksCount[i] < DesireStacks[i])
+                if (_mb.Cash < threshold)
                 {
-                    IsAvailable = false;
-                    if (i != 5)
-                    {
-                        //Разбиваем верхний номинал на N кол-во нижних и вычитаем
-                        DesireStacks[i + 1] += (DesireStacks[i] - MoneyStacksCount[i]) *
-                         Nominals[5 - i] / Nominals[4 - i];
+                    _closed = true;
+                    return ResponseCode.Closed;
+                }
+                int[] MoneyStacksCount = _mb.ReturnMoneyStackCount();
 
-                        Buffer += (DesireStacks[i] - MoneyStacksCount[i]) *
-                          Nominals[5 - i] % Nominals[4 - i];
-                        if (Buffer != 0)
+                //Начальное условие, можно ли набрать* всеми доступными купюрами
+                if (!GetValueToNoteConversion(Value, out int[] DesireStacks))
+                    return ResponseCode.TryToAbs;
+
+                //Если вообще не хватит денег на запрос
+                if (_mb.Cash < Value)
+                    return ResponseCode.NotEnoughMoney;
+
+                //Иначе продолжаем выполнять
+                bool IsAvailable = true;
+                int Buffer = 0;
+                //Цикл просмотра допустимости набора присутствующими купюрами
+                int[] Nominals = new int[] { 10, 50, 100, 500, 1000, 5000 };
+                for (int i = 0; i < 6; i++)
+                    if (MoneyStacksCount[i] < DesireStacks[i])
+                    {
+                        IsAvailable = false;
+                        if (i != 5)
                         {
-                            int Temp = Buffer % Nominals[4 - i];
-                            if (Temp == 0)
+                            //Разбиваем верхний номинал на N кол-во нижних и вычитаем
+                            DesireStacks[i + 1] += (DesireStacks[i] - MoneyStacksCount[i]) *
+                             Nominals[5 - i] / Nominals[4 - i];
+
+                            Buffer += (DesireStacks[i] - MoneyStacksCount[i]) *
+                              Nominals[5 - i] % Nominals[4 - i];
+                            if (Buffer != 0)
                             {
-                                DesireStacks[i + 1] += Buffer / Nominals[4 - i];
-                                Buffer = 0;
+                                int Temp = Buffer % Nominals[4 - i];
+                                if (Temp == 0)
+                                {
+                                    DesireStacks[i + 1] += Buffer / Nominals[4 - i];
+                                    Buffer = 0;
+                                }
                             }
+                            DesireStacks[i] = MoneyStacksCount[i];
                         }
-                        DesireStacks[i] = MoneyStacksCount[i];
+                        else
+                            break;
                     }
                     else
-                        break;
+                        IsAvailable = true;
+
+                //Если можно набрать - вытащить сумму из пачек
+                if (IsAvailable)
+                {
+                    for (int i = 0; i < 6; i++)
+                        _mb.GetMoneyFromStack(i, DesireStacks[i]);
+                    return ResponseCode.Good;
                 }
                 else
-                    IsAvailable = true;
-
-            //Если можно набрать - вытащить сумму из пачек
-            if (IsAvailable)
-            {
-                for (int i = 0; i < 6; i++)
-                    _mb.GetMoneyFromStack(i, DesireStacks[i]);
-                return ResponseCode.Good;
+                    return ResponseCode.TryToAbs;
             }
-            else
-                return ResponseCode.TryToAbs;
+
         }
 
         /// <summary>
@@ -121,13 +144,33 @@ namespace OOP2
         }
 
         /// <summary>
-        /// Метод для выдачи состояния 
+        /// Метод для выдачи состояния текстом. 
         /// </summary>
         /// <returns></returns>
         public override string ToString()
         {
-            return _threshold > _mb.Cash ? "Закрыт." : _mb.Cash.ToString();
+            return _closed ? "Закрыт." : _mb.Cash.ToString();
         }
 
+        public void ServeClient()
+        {
+            if (_clientQueue.Count != 0)
+            {
+                Client cl = _clientQueue.Peek();
+                
+                if (cl == null || cl.State == ClientState.Bad || cl.State == ClientState.Good)
+                {
+                    _clientQueue.Dequeue();
+                    _queueUpdEvent(false);
+                }
+            }
+            Thread.Sleep(50);  //Пусть считается, как время отклика
+        }
+
+        public void Enqueue(Client cl)
+        {
+            _clientQueue.Enqueue(cl);
+            _queueUpdEvent(true);
+        }
     }
 }

@@ -46,8 +46,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MainLogics\Hall\ATMHandler.cs" />
+    <Compile Include="MainLogics\Hall\ClientHandler.cs" />
     <Compile Include="MiscLogics\ATM\ATM.cs" />
-    <Compile Include="MiscLogics\ATM\Money\CustomCollection.cs" />
     <Compile Include="MiscLogics\ATM\Money\Note.cs" />
     <Compile Include="MiscLogics\ATM\Money\MoneyBox.cs" />
     <Compile Include="MiscLogics\ATM\Money\NotesStack.cs" />
@@ -61,6 +62,7 @@
     </Compile>
     <Compile Include="MainLogics\Hall\Hall.cs" />
     <Compile Include="MainLogics\Form\Program.cs" />
+    <Compile Include="MiscLogics\Client\ClientBehaviour.cs" />
     <Compile Include="MiscLogics\Client\ClientState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="MainLogics\Form\Form1.resx">

@@ -201,6 +201,7 @@ namespace OOP2
             0,
             0,
             0});
+            this.CtrlNUDThreshold.ValueChanged += new System.EventHandler(this.CtrlNUDThreshold_ValueChanged);
             // 
             // CtrlTBATMs
             // 

@@ -58,5 +58,10 @@ namespace OOP2
             else
                 _right = true;
         }
+
+        private void CtrlNUDThreshold_ValueChanged(object sender, EventArgs e)
+        {
+            ATM.threshold = (int)CtrlNUDThreshold.Value;
+        }
     }
 }
