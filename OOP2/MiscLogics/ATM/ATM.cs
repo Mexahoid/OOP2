@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace OOP2
 {
@@ -12,11 +9,16 @@ namespace OOP2
     /// </summary>
     class ATM
     {
+        #region Поля
+
         /// <summary>
         /// Минимальное значение суммы в банкомате.
         /// </summary>
         public static int threshold;
 
+        /// <summary>
+        /// Закрыт ли банкомат.
+        /// </summary>
         private bool _closed;
 
         /// <summary>
@@ -24,6 +26,9 @@ namespace OOP2
         /// </summary>
         private Queue<Client> _clientQueue;
 
+        /// <summary>
+        /// Событие обновления очереди.
+        /// </summary>
         private event Action<bool> _queueUpdEvent;
 
         /// <summary>
@@ -31,6 +36,9 @@ namespace OOP2
         /// </summary>
         private MoneyBox _mb;
 
+        /// <summary>
+        /// Свойство возврата состояния банкомата.
+        /// </summary>
         public bool Closed
         {
             get
@@ -38,6 +46,10 @@ namespace OOP2
                 return _closed;
             }
         }
+
+        #endregion
+
+        #region Методы
 
         /// <summary>
         /// Конструктор банкомата.
@@ -57,7 +69,7 @@ namespace OOP2
         /// <returns>Возвращает код ответа.</returns>
         public ResponseCode OrderMoney(int Value)
         {
-            Console.WriteLine($"Обращение на выдачу: {Value}");
+            //Console.WriteLine($"Обращение на выдачу: {Value}");
             object Locker = new object();
             lock (Locker)
             {
@@ -66,11 +78,11 @@ namespace OOP2
                 if (_mb.Cash < threshold)
                 {
                     _closed = true;
-                    Console.WriteLine("Пиздец, я вырубаюсь");
                     return ResponseCode.Closed;
                 }
                 int[] MoneyStacksCount = _mb.ReturnMoneyStackCount();
                 int[] DesireStacks;
+
                 //Начальное условие, можно ли набрать* всеми доступными купюрами
                 if (!GetValueToNoteConversion(Value, out DesireStacks))
                     return ResponseCode.TryToAbs;
@@ -154,18 +166,21 @@ namespace OOP2
             return _closed ? "Закрыт." : _mb.Cash.ToString();
         }
 
+        /// <summary>
+        /// Вечный метод обработки клиента в голове очереди.
+        /// </summary>
         public void ServeClient()
         {
             while (true)
             {
                 if (_clientQueue.Count != 0)
                 {
-                    Console.WriteLine("Очередь не пуста");
+                    //Console.WriteLine("Очередь не пуста");
                     Client cl = _clientQueue.Peek();
                     cl.GetServed();
                     if (cl.State == ClientState.Bad || cl.State == ClientState.Good)
                     {
-                        Console.WriteLine("Выгоняю клиента");
+                        //Console.WriteLine("Выгоняю клиента");
                         _clientQueue.Dequeue();
                         _queueUpdEvent(false);
                         cl.GoOut();
@@ -175,12 +190,22 @@ namespace OOP2
             }
         }
 
+        /// <summary>
+        /// Отвечает клиенту True, если клиент находится в начале очереди.
+        /// (Выполняется в потоке клиента).
+        /// </summary>
+        /// <param name="Asker">Экземпляр спрашивающего клиента.</param>
+        /// <returns>Возвращает логическое значение.</returns>
         public bool AnswerClient(Client Asker)
         {
-            Console.WriteLine("\n=====\nОтвет клиенту\n=====\n");
+            //Console.WriteLine("\n=====\nОтвет клиенту\n=====\n");
             return Asker.Equals(_clientQueue.Peek());
         }
 
+        /// <summary>
+        /// Возвращает данные о балансе и очереди.
+        /// </summary>
+        /// <returns>Возвращает массив строк.</returns>
         public string[] GetData()
         {
             string[] arr = new string[2];
@@ -189,16 +214,22 @@ namespace OOP2
             return arr;
         }
 
+        /// <summary>
+        /// Заталкивает клиента в очередь.
+        /// </summary>
+        /// <param name="cl">Экземпляр заталкиваемого клиента.</param>
         public void Enqueue(Client cl)
         {
             object locker = new object();
 
             lock (locker)
             {
-                Console.WriteLine("\n=====\nКлиент зашел в очередь\n=====\n");
+                //Console.WriteLine("\n=====\nКлиент зашел в очередь\n=====\n");
                 _clientQueue.Enqueue(cl);
                 _queueUpdEvent(true);
             }
         }
+
+        #endregion
     }
 }

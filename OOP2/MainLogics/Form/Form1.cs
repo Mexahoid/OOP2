@@ -1,51 +1,59 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace OOP2
 {
     public partial class MainForm : Form
     {
+        #region Поля
+
+        /// <summary>
+        /// Удовлетворяет ли верхняя граница.
+        /// </summary>
         private bool _right = true;
+
+        /// <summary>
+        /// Удовлетворяет ли нижняя граница.
+        /// </summary>
         private bool _left = true;
+
+        /// <summary>
+        /// Экземпляр зала с банкоматами.
+        /// </summary>
         private Hall _hall;
-        private SynchronizationContext SC;
-        private Thread hallThread;
+
+        /// <summary>
+        /// Поток выполнения зала с банкоматами.
+        /// </summary>
+        private Thread _hallThread;
+
+        #endregion
 
         public MainForm()
         {
             InitializeComponent();
-            SC = SynchronizationContext.Current;
-            CtrlDGVHall.ColumnCount = 3;
-            CtrlDGVHall.RowCount = 3;
         }
 
         private void CtrlButStart_Click(object sender, EventArgs e)
         {
+            CtrlDGVHall.ColumnCount = (int)CtrlNUDATMs.Value;
+            CtrlDGVHall.RowCount = 3;
             Client.lb = (int)CtrlNUDLeftBoundary.Value;
             Client.rb = (int)CtrlNUDRightBoundary.Value;
             if (_right && _left)
             {
-                _hall = new Hall((int)CtrlNUDATMs.Value);
-                Console.WriteLine("Новый таск");
-                _hall.ReloadData += OnDataChange;
-                hallThread = new Thread(_hall.StartClientThread);
-                hallThread.Start(SC);
-                //_taskHall = Task.Factory.StartNew(_hall.StartClientThread);
+                _hall = new Hall((int)CtrlNUDATMs.Value, OnDataChange);
+                _hallThread = new Thread(_hall.StartClientThread);
+                _hallThread.Start(SynchronizationContext.Current);
             }
         }
 
         private void CtrlButStop_Click(object sender, EventArgs e)
         {
-            Console.WriteLine("Sas");
-            MessageBox.Show("sas");
+            _hallThread.Abort();
+            CtrlDGVHall.ColumnCount = 0;
+            _hall = null;
         }
 
         private void CtrlNUDLeftBoundary_ValueChanged(object sender, EventArgs e)
@@ -79,7 +87,7 @@ namespace OOP2
 
         private void OnDataChange(string[,] Arr)
         {
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < (int)CtrlNUDATMs.Value; i++)
             {
                 for (int j = 0; j < 3; j++)
                 {

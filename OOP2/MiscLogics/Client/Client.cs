@@ -12,6 +12,8 @@ namespace OOP2
     /// </summary>
     class Client
     {
+        #region Поля
+
         public static Hall hallLink;
 
         /// <summary>
@@ -47,6 +49,15 @@ namespace OOP2
         private ATM _atmLink;
 
         /// <summary>
+        /// Состояние клиента.
+        /// </summary>
+        public ClientState State { get { return _state; } }
+
+        #endregion
+
+        #region Методы
+
+        /// <summary>
         /// Конструктор клиента.
         /// </summary>
         /// <param name="GoOutEventHandler">Делегат для обработки события ухода.</param>
@@ -61,11 +72,6 @@ namespace OOP2
         }
 
         /// <summary>
-        /// Состояние клиента.
-        /// </summary>
-        public ClientState State { get { return _state; } set { _state = value; } }
-
-        /// <summary>
         /// Главное действие клиента.
         /// </summary>
         public void AskATM()
@@ -76,41 +82,48 @@ namespace OOP2
                 if (_state == ClientState.Fresh)
                 {
                     _atmLink = hallLink.GetMinimalATMLink();
-                    Console.WriteLine("Клиент взял ссылку");
+                    //Console.WriteLine("Клиент взял ссылку");
                     _atmLink.Enqueue(this);
                 }
             }
             while (_state == ClientState.Fresh)
             {
-                Console.WriteLine("Попытка захода в очередь");
+                //Console.WriteLine("Попытка захода в очередь");
                 if (!_atmLink.AnswerClient(this))
                 {
-                    Console.WriteLine("Не зашел");
+                    //Console.WriteLine("Не зашел");
                     Thread.Sleep(5000);
                 }
                 else
                 {
-                    Console.WriteLine("\n=====\nЗашел\n=====\n");
+                    //Console.WriteLine("\n=====\nЗашел\n=====\n");
                     break;
                 }
             }
         }
 
+        /// <summary>
+        /// Метод обслуживание клиента (выполняется в потоке банкомата).
+        /// </summary>
         public void GetServed()
         {
             object locker = new object();
 
             lock (locker)
             {
-                Console.WriteLine("Банкомат обслуживает меня");
+                //Console.WriteLine("Банкомат обслуживает меня");
                 TakeResponse(_atmLink.OrderMoney(_desire));
                 Thread.Sleep(2000);
             }
         }
 
+        /// <summary>
+        /// Насильственный выгон клиента из очереди.
+        /// (Вызывается банкоматом).
+        /// </summary>
         public void GoOut()
         {
-            Console.WriteLine("\n=====\nКлиент ушел\n=====\n");
+            //Console.WriteLine("\n=====\nКлиент ушел\n=====\n");
             _goOutEvent();
         }
 
@@ -123,31 +136,30 @@ namespace OOP2
             switch (Code)
             {
                 case ResponseCode.Good:
-                    Console.WriteLine("Еее, я получил бабло");
+                    //Console.WriteLine("Еее, я получил бабло");
                     _state = ClientState.Good;
-                    _atmLink = null;
                     break;
                 case ResponseCode.TryToAbs:
                     _tries--;
-                    Console.WriteLine("Надо подумать");
+                    //Console.WriteLine("Надо подумать");
                     if (_tries == 2)
                     {
-                        Console.WriteLine($"Хочу {_desire}");
+                        //Console.WriteLine($"Хочу {_desire}");
                         _desire /= 100;
                         _desire *= 100;
                     }
                     else if (_tries == 1)
                     {
-                        Console.WriteLine($"Хочу {_desire}");
+                        //Console.WriteLine($"Хочу {_desire}");
                         _desire /= 1000;
                         _desire *= 1000;
                     }
-                    Console.WriteLine($"Хочу {_desire}");
+                    //Console.WriteLine($"Хочу {_desire}");
                     _state = ClientState.Thinking;
                     break;
                 case ResponseCode.NotEnoughMoney:
                     _tries--;
-                    Console.WriteLine("Бля, денег не хватает");
+                    //Console.WriteLine("Чорт, денег не хватает");
                     if (_tries != 0)
                     {
                         Random Rnd = new Random(DateTime.UtcNow.Millisecond);
@@ -156,23 +168,25 @@ namespace OOP2
                         _state = ClientState.Thinking;
                     }
                     else
-                    {
-                        _atmLink = null;
                         _state = ClientState.Bad;
-                    }
                     break;
                 case ResponseCode.Closed:
                     _tries = 0;
-                    Console.WriteLine("Сука, ухожу");
+                    //Console.WriteLine("Эх, ухожу");
                     _state = ClientState.Bad;
-                    _atmLink = null;
                     break;
             }
+            _Destructor();  //<- Не помню, зачем нужно.
         }
 
+        /// <summary>
+        /// Метод очищения ссылки на банкомат.
+        /// </summary>
         private void _Destructor()
         {
             _atmLink = null;
         }
+
+        #endregion
     }
 }

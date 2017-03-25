@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Threading;
 
 namespace OOP2
@@ -12,24 +9,34 @@ namespace OOP2
     /// </summary>
     class Hall
     {
+        #region Поля
+
         /// <summary>
-        /// Список банкоматов.
+        /// Список обработчиков банкоматов.
         /// </summary>
         private List<ATMHandler> _atmList;
 
+        /// <summary>
+        /// Список обработчиков клиентов.
+        /// </summary>
         private List<ClientHandler> _clientList;
 
+        /// <summary>
+        /// Поток вывода данных на форму.
+        /// </summary>
         private Thread _dataUpdateThread;
 
-        private object _locker;
+        #endregion
+
+        #region Методы
 
         /// <summary>
         /// Конструктор зала.
         /// </summary>
         /// <param name="ATMCount">Количество банкоматов.</param>
-        public Hall(int ATMCount)
+        public Hall(int ATMCount, Action<string[,]> FormUpdaterMethod)
         {
-            _locker = new object();
+            _ReloadData += FormUpdaterMethod;
             _atmList = new List<ATMHandler>();
             _clientList = new List<ClientHandler>();
             for (int i = 0; i < ATMCount; i++)
@@ -41,20 +48,42 @@ namespace OOP2
             Client.hallLink = this;
         }
 
-        private void _NullClientEventHandler(int Pos)
+        #region Обработка клиентов
+
+        /// <summary>
+        /// Обработчик события ухода клиента.
+        /// </summary>
+        /// <param name="Hash">Позиция уходящего клиента.</param>
+        private void _NullClientEventHandler(int Hash)
         {
-            lock (_locker)
-                if (_clientList != null && _clientList.Count > Pos)
-                    _clientList.RemoveAt(Pos);
+            object locker = new object();
+            lock (locker)
+                if (_clientList != null)
+                {
+                    int c = _clientList.Count;
+                    for (int i = 0; i < c; i++)
+                    {
+                        if (_clientList[i].HandlerID == Hash)
+                        {
+                            _clientList.RemoveAt(i);
+                            break;
+                        }
+                    }
+                }
         }
 
+        /// <summary>
+        /// Главный метод работы зала. 
+        /// Добавляет клиентов через случайные промежутки времени.
+        /// </summary>
+        /// <param name="param">Контекст синхронизации.</param>
         public void StartClientThread(object param)
         {
             Random rnd = new Random(DateTime.UtcNow.Millisecond);
             while (true)
             {
                 Console.WriteLine("\n=========\nНовый клиент\n=========");
-                _clientList.Add(new ClientHandler(_NullClientEventHandler, _clientList.Count));
+                _clientList.Add(new ClientHandler(_NullClientEventHandler));
                 _clientList[_clientList.Count - 1].StartWork();
                 int Time = rnd.Next(0, 30);
                 _dataUpdateThread = new Thread(DataReload);
@@ -63,24 +92,10 @@ namespace OOP2
             }
         }
 
-        private void DataReload(object param)
-        {
-            while (true)
-            {
-                SynchronizationContext sc = (SynchronizationContext)param;
-                sc.Send(Sas, GetData());
-                Thread.Sleep(10);
-            }
-        }
-
-        public void Sas(object Arr)
-        {
-            if (ReloadData != null)
-                ReloadData((string[,])Arr);
-        }
-
-        public event Action<string[,]> ReloadData;
-
+        /// <summary>
+        /// Возвращает ссылку на банкомат с минимальной очередью.
+        /// </summary>
+        /// <returns>Возвращает экземпляр типа ATM.</returns>
         public ATM GetMinimalATMLink()
         {
             object locker = new object();
@@ -91,35 +106,88 @@ namespace OOP2
                 int j = 0;
                 for (int i = 0; i < C; i++)
                 {
-                    Console.WriteLine($"У бабломета {i} стоит {_atmList[i].QueueLength} человек.");
-                    Console.WriteLine($"Бабломет {i} закрыт - {_atmList[i].Atm.Closed}");
+                    //Console.WriteLine($"У бабломета {i} стоит {_atmList[i].QueueLength} человек.");
+                    //Console.WriteLine($"Бабломет {i} закрыт - {_atmList[i].Atm.Closed}");
                     if (!_atmList[i].Atm.Closed && _atmList[i].QueueLength < min)
                     {
-                        Console.WriteLine("Оп, проверка");
+                        //Console.WriteLine("Оп, проверка");
                         min = _atmList[i].QueueLength;
                         j = i;
                     }
                     Thread.Sleep(1000);
                 }
-                Console.WriteLine($"\n=====\nВыдана ссылка на {j} автомат");
+                //Console.WriteLine($"\n=====\nВыдана ссылка на {j} автомат");
                 return _atmList[j].Atm;
             }
         }
 
+        #endregion
+
+        #region Вывод данных
+
+        /// <summary>
+        /// Вечный метод отдельного потока обновления данных на форме.
+        /// </summary>
+        /// <param name="param">Контекст синхронизации.</param>
+        private void DataReload(object param)
+        {
+            while (true)
+            {
+                SynchronizationContext sc = (SynchronizationContext)param;
+                sc.Send(_ReloadFormData, GetData());
+                Thread.Sleep(10);
+            }
+        }
+
+        /// <summary>
+        /// Обертка над событием обновления формы.
+        /// </summary>
+        /// <param name="Arr">Массив данных.</param>
+        private void _ReloadFormData(object Arr)
+        {
+            _ReloadData((string[,])Arr);
+        }
+
+        /// <summary>
+        /// Событие обновления данных на форме.
+        /// </summary>
+        private event Action<string[,]> _ReloadData;
+
+        /// <summary>
+        /// Возвращает массив с данными о банкоматах.
+        /// </summary>
+        /// <returns>Возвращает двумерный массив строк.</returns>
         private string[,] GetData()
         {
-            string[,] arr = new string[3, 3];
+            int C = _atmList.Count;
+            string[,] arr = new string[3, C];
             string[] dat;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < C; i++)
             {
-                arr[0, i] = $"Бабломет {i}";
-                dat = _atmList[i].Atm.GetData();
-                arr[1, i] = dat[0];
-                arr[2, i] = dat[1];
+                arr[0, i] = $"Банкомат {i}";
+                if (_atmList[i].Atm == null)
+                {
+                    arr[1, i] = "Банкомат не работает.";
+                    arr[2, i] = "Клиентов нет.";
+                }
+                else
+                {
+                    dat = _atmList[i].Atm.GetData();
+                    arr[1, i] = dat[0];
+                    arr[2, i] = dat[1];
+                }
             }
             return arr;
         }
 
+        #endregion
+
+        #region Финализатор
+
+        /// <summary>
+        /// Деструктор холла. Отключает поток обновления
+        /// формы и удаляет всех клиентов и банкоматы.
+        /// </summary>
         ~Hall()
         {
             _dataUpdateThread.Abort();
@@ -130,5 +198,9 @@ namespace OOP2
             for (int i = 0; i < C; i++)
                 _atmList[i] = null;
         }
+
+        #endregion
+
+        #endregion
     }
 }
