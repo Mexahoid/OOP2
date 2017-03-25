@@ -43,12 +43,12 @@ namespace OOP2
             this.CtrlNUDLeftBoundary = new System.Windows.Forms.NumericUpDown();
             this.CtrlNUDRightBoundary = new System.Windows.Forms.NumericUpDown();
             this.CtrlNUDThreshold = new System.Windows.Forms.NumericUpDown();
-            this.CtrlTBATMs = new System.Windows.Forms.NumericUpDown();
+            this.CtrlNUDATMs = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.CtrlDGVHall)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CtrlNUDLeftBoundary)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CtrlNUDRightBoundary)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CtrlNUDThreshold)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.CtrlTBATMs)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.CtrlNUDATMs)).BeginInit();
             this.SuspendLayout();
             // 
             // CtrlDGVHall
@@ -179,7 +179,7 @@ namespace OOP2
             this.CtrlNUDRightBoundary.Size = new System.Drawing.Size(72, 20);
             this.CtrlNUDRightBoundary.TabIndex = 14;
             this.CtrlNUDRightBoundary.Value = new decimal(new int[] {
-            1000,
+            10000,
             0,
             0,
             0});
@@ -203,18 +203,18 @@ namespace OOP2
             0});
             this.CtrlNUDThreshold.ValueChanged += new System.EventHandler(this.CtrlNUDThreshold_ValueChanged);
             // 
-            // CtrlTBATMs
+            // CtrlNUDATMs
             // 
-            this.CtrlTBATMs.Location = new System.Drawing.Point(15, 31);
-            this.CtrlTBATMs.Maximum = new decimal(new int[] {
+            this.CtrlNUDATMs.Location = new System.Drawing.Point(15, 31);
+            this.CtrlNUDATMs.Maximum = new decimal(new int[] {
             12,
             0,
             0,
             0});
-            this.CtrlTBATMs.Name = "CtrlTBATMs";
-            this.CtrlTBATMs.Size = new System.Drawing.Size(73, 20);
-            this.CtrlTBATMs.TabIndex = 16;
-            this.CtrlTBATMs.Value = new decimal(new int[] {
+            this.CtrlNUDATMs.Name = "CtrlNUDATMs";
+            this.CtrlNUDATMs.Size = new System.Drawing.Size(73, 20);
+            this.CtrlNUDATMs.TabIndex = 16;
+            this.CtrlNUDATMs.Value = new decimal(new int[] {
             3,
             0,
             0,
@@ -225,7 +225,7 @@ namespace OOP2
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(520, 439);
-            this.Controls.Add(this.CtrlTBATMs);
+            this.Controls.Add(this.CtrlNUDATMs);
             this.Controls.Add(this.CtrlNUDThreshold);
             this.Controls.Add(this.CtrlNUDRightBoundary);
             this.Controls.Add(this.CtrlNUDLeftBoundary);
@@ -244,7 +244,7 @@ namespace OOP2
             ((System.ComponentModel.ISupportInitialize)(this.CtrlNUDLeftBoundary)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.CtrlNUDRightBoundary)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.CtrlNUDThreshold)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.CtrlTBATMs)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.CtrlNUDATMs)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -283,7 +283,7 @@ namespace OOP2
         private NumericUpDown CtrlNUDLeftBoundary;
         private NumericUpDown CtrlNUDRightBoundary;
         private NumericUpDown CtrlNUDThreshold;
-        private NumericUpDown CtrlTBATMs;
+        private NumericUpDown CtrlNUDATMs;
     }
 }
 

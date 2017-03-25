@@ -68,9 +68,9 @@ namespace OOP2
                     return ResponseCode.Closed;
                 }
                 int[] MoneyStacksCount = _mb.ReturnMoneyStackCount();
-
+                int[] DesireStacks;
                 //Начальное условие, можно ли набрать* всеми доступными купюрами
-                if (!GetValueToNoteConversion(Value, out int[] DesireStacks))
+                if (!GetValueToNoteConversion(Value, out DesireStacks))
                     return ResponseCode.TryToAbs;
 
                 //Если вообще не хватит денег на запрос
@@ -154,17 +154,27 @@ namespace OOP2
 
         public void ServeClient()
         {
-            if (_clientQueue.Count != 0)
+            while (true)
             {
-                Client cl = _clientQueue.Peek();
-                
-                if (cl == null || cl.State == ClientState.Bad || cl.State == ClientState.Good)
+                if (_clientQueue.Count != 0)
                 {
-                    _clientQueue.Dequeue();
-                    _queueUpdEvent(false);
+                    Client cl = _clientQueue.Peek();
+                    cl.GetServed();
+                    if (cl.State == ClientState.Bad || cl.State == ClientState.Good)
+                    {
+                        _clientQueue.Dequeue();
+                        _queueUpdEvent(false);
+                        cl.GoOut();
+                    }
                 }
+                Thread.Sleep(50);  //Пусть считается, как время отклика
             }
-            Thread.Sleep(50);  //Пусть считается, как время отклика
+        }
+
+        public bool AnswerClient(Client Asker)
+        {
+            Console.WriteLine("Ответ клиенту");
+            return Asker.Equals(_clientQueue.Peek());
         }
 
         public void Enqueue(Client cl)

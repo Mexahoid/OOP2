@@ -22,12 +22,12 @@ namespace OOP2
         /// <param name="Nominal">Номинал купюры.</param>
         public Note(int Nominal)
         {
-            this.Nominal = Nominal;
+            _nominal = Nominal;
         }
 
         /// <summary>
         /// Номинал купюры.
         /// </summary>
-        public int Nominal { get => _nominal; set => _nominal = value; }
+        public int Nominal { get { return _nominal; } set { _nominal = value; } }
     }
 }

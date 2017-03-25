@@ -32,6 +32,7 @@ namespace OOP2
             _clientList = new List<ClientHandler>();
             for (int i = 0; i < ATMCount; i++)
             {
+                Console.WriteLine("Новый банкомат");
                 _atmList.Add(new ATMHandler());
                 _atmList[_atmList.Count - 1].StartWork();
             }
@@ -41,14 +42,16 @@ namespace OOP2
         private void _NullClientEventHandler(int Pos)
         {
             lock (_locker)
-                _clientList.RemoveAt(Pos);
+                if (_clientList != null)
+                    _clientList.RemoveAt(Pos);
         }
 
-        public void ClientThread()
+        public void StartClientThread()
         {
             Random rnd = new Random(DateTime.UtcNow.Millisecond);
             while (true)
             {
+                Console.WriteLine("Новый клиент");
                 _clientList.Add(new ClientHandler(_NullClientEventHandler, _clientList.Count));
                 _clientList[_clientList.Count - 1].StartWork();
                 int Time = rnd.Next(0, 30);

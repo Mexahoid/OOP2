@@ -12,8 +12,10 @@ namespace OOP2
 {
     public partial class MainForm : Form
     {
-        private bool _right = false;
-        private bool _left = false;
+        private bool _right = true;
+        private bool _left = true;
+        private Hall _hall;
+        private Task _taskHall;
 
         public MainForm()
         {
@@ -26,7 +28,9 @@ namespace OOP2
             Client.rb = (int)CtrlNUDRightBoundary.Value;
             if(_right && _left)
             {
-
+                _hall = new Hall((int)CtrlNUDATMs.Value);
+                Console.WriteLine("Новый таск");
+                _taskHall = Task.Factory.StartNew(_hall.StartClientThread);
             }
         }
 

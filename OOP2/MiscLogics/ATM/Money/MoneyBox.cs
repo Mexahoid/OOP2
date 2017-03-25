@@ -24,7 +24,7 @@ namespace OOP2
         /// <summary>
         /// Общая сумма купюр.
         /// </summary>
-        public int Cash { get => _cash; set => _cash = value; }
+        public int Cash { get { return _cash; } set { _cash = value; } }
 
         /// <summary>
         /// Конструктор короба.

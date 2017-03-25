@@ -24,7 +24,7 @@ namespace OOP2
         /// <summary>
         /// Возвращает номинал пачки.
         /// </summary>
-        public int Nominal { get => _nominal; }
+        public int Nominal { get { return _nominal; } }
 
         /// <summary>
         /// Конструктор пачки денег.
@@ -54,17 +54,17 @@ namespace OOP2
         /// Возвращает общую сумму купюр в пачке.
         /// </summary>
         /// <returns></returns>
-        public int ReturnStackCash() => _nominal * _notes.Count;
+        public int ReturnStackCash() { return _nominal * _notes.Count;}
 
         /// <summary>
         /// Возвращает количество купюр в пачке.
         /// </summary>
         /// <returns></returns>
-        public int ReturnStackCount() => _notes.Count;
+        public int ReturnStackCount() { return _notes.Count;}
 
         /// <summary>
         /// Убирает одну купюру из пачки.
         /// </summary>
-        private void _PopNote() => _notes.RemoveAt(_notes.Count - 1);
+        private void _PopNote() { _notes.RemoveAt(_notes.Count - 1);}
     }
 }

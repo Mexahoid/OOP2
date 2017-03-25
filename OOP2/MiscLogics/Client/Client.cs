@@ -49,10 +49,10 @@ namespace OOP2
         /// <summary>
         /// Конструктор клиента.
         /// </summary>
-        /// <param name="EventHandler">Делегат для обработки события ухода.</param>
-        public Client(Action EventHandler)
+        /// <param name="GoOutEventHandler">Делегат для обработки события ухода.</param>
+        public Client(Action GoOutEventHandler)
         {
-            _goOutEvent += EventHandler;
+            _goOutEvent += GoOutEventHandler;
             _goOutEvent += _Destructor;
             Random Rnd = new Random(DateTime.UtcNow.Millisecond);
             _state = ClientState.Fresh;
@@ -67,18 +67,50 @@ namespace OOP2
         /// <summary>
         /// Главное действие клиента.
         /// </summary>
-        public void Action()
+        public void AskATM()
         {
-            if (_atmLink != null)
-                TakeResponse(_atmLink.OrderMoney(_desire));
-            else if (_state == ClientState.Fresh)
+            while (_atmLink == null)
             {
-                _atmLink = hallLink.GetMinimalATMLink();
-                _atmLink.Enqueue(this);
+                Thread.Sleep(1000);
+                if (_state == ClientState.Fresh)
+                {
+                    _atmLink = hallLink.GetMinimalATMLink();
+                    Console.WriteLine("Клиент взял ссылку");
+                    _atmLink.Enqueue(this);
+                }
             }
-            else
-                _goOutEvent();
-            Thread.Sleep(1000);
+            while (_state == ClientState.Fresh)
+            {
+                Console.WriteLine("Попытка захода в очередь");
+                if (!_atmLink.AnswerClient(this))
+                {
+                    Console.WriteLine("Не зашел");
+                    Thread.Sleep(1000);
+                }
+                else
+                {
+                    Console.WriteLine("Зашел");
+                    break;
+                }
+            }
+        }
+
+        public void GetServed()
+        {
+            object locker = new object();
+
+            lock (locker)
+            {
+                Console.WriteLine("Банкомат обслуживает меня");
+                TakeResponse(_atmLink.OrderMoney(_desire));
+                Thread.Sleep(2000);
+            }
+        }
+
+        public void GoOut()
+        {
+            Console.WriteLine("Клиент ушел");
+            _goOutEvent();
         }
 
         /// <summary>

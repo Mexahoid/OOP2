@@ -22,7 +22,7 @@ namespace OOP2
             _nullClientEvent += Event;
             _handlerID = LogNum;
             _client = new Client(_ClientGoneEventHandler);
-            _thread = new Thread(_client.Action);
+            _thread = new Thread(_client.AskATM);
         }
 
         public void StartWork()
