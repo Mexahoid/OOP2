@@ -28,6 +28,6 @@ namespace OOP2
         /// <summary>
         /// Номинал купюры.
         /// </summary>
-        public int Nominal { get { return _nominal; } set { _nominal = value; } }
+        public int Nominal { get { return _nominal; } }
     }
 }

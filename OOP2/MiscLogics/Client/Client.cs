@@ -176,7 +176,7 @@ namespace OOP2
                     _state = ClientState.Bad;
                     break;
             }
-            _Destructor();  //<- Не помню, зачем нужно.
+            //_Destructor();  //<- Не помню, зачем нужно.
         }
 
         /// <summary>

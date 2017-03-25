@@ -69,7 +69,7 @@ namespace OOP2
         /// <returns>Возвращает код ответа.</returns>
         public ResponseCode OrderMoney(int Value)
         {
-            //Console.WriteLine($"Обращение на выдачу: {Value}");
+            Console.WriteLine($"Обращение на выдачу: {Value}");
             object Locker = new object();
             lock (Locker)
             {
@@ -149,11 +149,17 @@ namespace OOP2
             /*[10, 50, 100, 500, 1000, 5000]*/
             Counts = new int[6];
             bool flag = false;
-            for (int i = 5, j = 5000; i >= 0 && Value != 0; i--, flag = !flag, j /= flag ? 2 : 5)
+            for (int i = 5, j = 5000; i >= 0 && Value != 0; i--, j /= flag ? 2 : 5, flag = !flag)
             {
-                Counts[5 - i] = Value / j;
+                Counts[i] = Value / j;
                 Value %= j;
             }
+            //Console.WriteLine($"10 - {Counts[0]}");
+            //Console.WriteLine($"50 - {Counts[1]}");
+            //Console.WriteLine($"100 - {Counts[2]}");
+            //Console.WriteLine($"500 - {Counts[3]}");
+            //Console.WriteLine($"1000 - {Counts[4]}");
+            //Console.WriteLine($"5000 - {Counts[5]}");
             return Value == 0;
         }
 

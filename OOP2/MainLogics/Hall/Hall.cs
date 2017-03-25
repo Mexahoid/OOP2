@@ -41,7 +41,7 @@ namespace OOP2
             _clientList = new List<ClientHandler>();
             for (int i = 0; i < ATMCount; i++)
             {
-                Console.WriteLine("Новый банкомат");
+                //Console.WriteLine("Новый банкомат");
                 _atmList.Add(new ATMHandler());
                 _atmList[_atmList.Count - 1].StartWork();
             }
@@ -82,7 +82,7 @@ namespace OOP2
             Random rnd = new Random(DateTime.UtcNow.Millisecond);
             while (true)
             {
-                Console.WriteLine("\n=========\nНовый клиент\n=========");
+                //Console.WriteLine("\n=========\nНовый клиент\n=========");
                 _clientList.Add(new ClientHandler(_NullClientEventHandler));
                 _clientList[_clientList.Count - 1].StartWork();
                 int Time = rnd.Next(0, 30);
