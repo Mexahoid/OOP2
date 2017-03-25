@@ -83,6 +83,11 @@ namespace OOP2
             }
             while (_state == ClientState.Fresh)
             {
+                if (_atmLink.Closed)
+                {
+                    GoOut();
+                    break;
+                }
                 //Console.WriteLine("Попытка захода в очередь");
                 if (!_atmLink.AnswerClient(this))
                 {
@@ -173,6 +178,7 @@ namespace OOP2
             }
             //_Destructor();  //<- Не помню, зачем нужно.
         }
+
         #endregion
     }
 }

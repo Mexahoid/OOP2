@@ -52,8 +52,8 @@ namespace OOP2
         private void CtrlButStop_Click(object sender, EventArgs e)
         {
             _hallThread.Abort();
-            CtrlDGVHall.ColumnCount = 0;
             _hall = null;
+            CtrlDGVHall.ColumnCount = 0;
         }
 
         private void CtrlNUDLeftBoundary_ValueChanged(object sender, EventArgs e)

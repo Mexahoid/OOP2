@@ -190,6 +190,7 @@ namespace OOP2
         /// </summary>
         ~Hall()
         {
+            _ReloadData = null;
             _dataUpdateThread.Abort();
             int C = _clientList.Count;
             for (int i = 0; i < C; i++)
