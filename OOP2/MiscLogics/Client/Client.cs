@@ -178,15 +178,6 @@ namespace OOP2
             }
             //_Destructor();  //<- Не помню, зачем нужно.
         }
-
-        /// <summary>
-        /// Метод очищения ссылки на банкомат.
-        /// </summary>
-        private void _Destructor()
-        {
-            _atmLink = null;
-        }
-
         #endregion
     }
 }
