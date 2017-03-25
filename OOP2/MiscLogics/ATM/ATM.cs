@@ -46,7 +46,7 @@ namespace OOP2
         {
             _clientQueue = new Queue<Client>();
             _mb = new MoneyBox();
-            _closed = true;
+            _closed = false;
             _queueUpdEvent += QueueEventHandler;
         }
 
@@ -57,6 +57,7 @@ namespace OOP2
         /// <returns>Возвращает код ответа.</returns>
         public ResponseCode OrderMoney(int Value)
         {
+            Console.WriteLine($"Обращение на выдачу: {Value}");
             object Locker = new object();
             lock (Locker)
             {
@@ -65,6 +66,7 @@ namespace OOP2
                 if (_mb.Cash < threshold)
                 {
                     _closed = true;
+                    Console.WriteLine("Пиздец, я вырубаюсь");
                     return ResponseCode.Closed;
                 }
                 int[] MoneyStacksCount = _mb.ReturnMoneyStackCount();
@@ -158,10 +160,12 @@ namespace OOP2
             {
                 if (_clientQueue.Count != 0)
                 {
+                    Console.WriteLine("Очередь не пуста");
                     Client cl = _clientQueue.Peek();
                     cl.GetServed();
                     if (cl.State == ClientState.Bad || cl.State == ClientState.Good)
                     {
+                        Console.WriteLine("Выгоняю клиента");
                         _clientQueue.Dequeue();
                         _queueUpdEvent(false);
                         cl.GoOut();
@@ -173,14 +177,28 @@ namespace OOP2
 
         public bool AnswerClient(Client Asker)
         {
-            Console.WriteLine("Ответ клиенту");
+            Console.WriteLine("\n=====\nОтвет клиенту\n=====\n");
             return Asker.Equals(_clientQueue.Peek());
+        }
+
+        public string[] GetData()
+        {
+            string[] arr = new string[2];
+            arr[0] = "Деньги: " + _mb.Cash;
+            arr[1] = "Клиенты: " + _clientQueue.Count;
+            return arr;
         }
 
         public void Enqueue(Client cl)
         {
-            _clientQueue.Enqueue(cl);
-            _queueUpdEvent(true);
+            object locker = new object();
+
+            lock (locker)
+            {
+                Console.WriteLine("\n=====\nКлиент зашел в очередь\n=====\n");
+                _clientQueue.Enqueue(cl);
+                _queueUpdEvent(true);
+            }
         }
     }
 }

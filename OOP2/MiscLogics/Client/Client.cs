@@ -57,6 +57,7 @@ namespace OOP2
             Random Rnd = new Random(DateTime.UtcNow.Millisecond);
             _state = ClientState.Fresh;
             _desire = Rnd.Next(lb, rb);
+            _tries = 3;
         }
 
         /// <summary>
@@ -85,11 +86,11 @@ namespace OOP2
                 if (!_atmLink.AnswerClient(this))
                 {
                     Console.WriteLine("Не зашел");
-                    Thread.Sleep(1000);
+                    Thread.Sleep(5000);
                 }
                 else
                 {
-                    Console.WriteLine("Зашел");
+                    Console.WriteLine("\n=====\nЗашел\n=====\n");
                     break;
                 }
             }
@@ -109,7 +110,7 @@ namespace OOP2
 
         public void GoOut()
         {
-            Console.WriteLine("Клиент ушел");
+            Console.WriteLine("\n=====\nКлиент ушел\n=====\n");
             _goOutEvent();
         }
 
@@ -122,25 +123,31 @@ namespace OOP2
             switch (Code)
             {
                 case ResponseCode.Good:
+                    Console.WriteLine("Еее, я получил бабло");
                     _state = ClientState.Good;
                     _atmLink = null;
                     break;
                 case ResponseCode.TryToAbs:
                     _tries--;
+                    Console.WriteLine("Надо подумать");
                     if (_tries == 2)
                     {
+                        Console.WriteLine($"Хочу {_desire}");
                         _desire /= 100;
                         _desire *= 100;
                     }
                     else if (_tries == 1)
                     {
+                        Console.WriteLine($"Хочу {_desire}");
                         _desire /= 1000;
                         _desire *= 1000;
                     }
+                    Console.WriteLine($"Хочу {_desire}");
                     _state = ClientState.Thinking;
                     break;
                 case ResponseCode.NotEnoughMoney:
                     _tries--;
+                    Console.WriteLine("Бля, денег не хватает");
                     if (_tries != 0)
                     {
                         Random Rnd = new Random(DateTime.UtcNow.Millisecond);
@@ -156,6 +163,7 @@ namespace OOP2
                     break;
                 case ResponseCode.Closed:
                     _tries = 0;
+                    Console.WriteLine("Сука, ухожу");
                     _state = ClientState.Bad;
                     _atmLink = null;
                     break;

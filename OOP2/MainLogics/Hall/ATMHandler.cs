@@ -37,7 +37,7 @@ namespace OOP2
         {
 
         }
-        
+
         public int QueueLength
         {
             get
@@ -48,10 +48,17 @@ namespace OOP2
 
         private void _QueueLengthChangeEventHandler(bool flag)
         {
+            Console.WriteLine("Вызов обработчика очереди");
             if (flag)
+            {
                 _queueLength++;
+                Console.WriteLine("Добавлен");
+            }
             else
+            {
                 _queueLength--;
+                Console.WriteLine("Убран");
+            }
         }
 
         public ATM Atm
