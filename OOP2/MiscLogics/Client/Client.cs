@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace OOP2
 {
@@ -64,7 +60,6 @@ namespace OOP2
         public Client(Action GoOutEventHandler)
         {
             _goOutEvent += GoOutEventHandler;
-            _goOutEvent += _Destructor;
             Random Rnd = new Random(DateTime.UtcNow.Millisecond);
             _state = ClientState.Fresh;
             _desire = Rnd.Next(lb, rb);
