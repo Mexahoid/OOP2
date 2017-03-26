@@ -91,6 +91,7 @@ namespace OOP2
             {
                 for (int j = 0; j < 3; j++)
                 {
+                    if(CtrlDGVHall.RowCount != 0)
                     CtrlDGVHall.Rows[j].Cells[i].Value = Arr[j, i];
                 }
             }

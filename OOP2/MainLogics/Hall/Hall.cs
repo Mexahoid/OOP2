@@ -134,7 +134,14 @@ namespace OOP2
             while (true)
             {
                 SynchronizationContext sc = (SynchronizationContext)param;
-                sc.Send(_ReloadFormData, GetData());
+                try
+                {
+                    sc.Send(_ReloadFormData, GetData());
+                }
+                catch
+                {
+
+                }
                 Thread.Sleep(10);
             }
         }
@@ -164,7 +171,7 @@ namespace OOP2
             string[] dat;
             for (int i = 0; i < C; i++)
             {
-                arr[0, i] = $"Банкомат {i}";
+                arr[0, i] = "Банкомат " + i;
                 if (_atmList[i].Atm == null)
                 {
                     arr[1, i] = "Банкомат не работает.";
@@ -192,6 +199,7 @@ namespace OOP2
         {
             _ReloadData = null;
             _dataUpdateThread.Abort();
+            _dataUpdateThread = null;
             int C = _clientList.Count;
             for (int i = 0; i < C; i++)
                 _clientList[i] = null;

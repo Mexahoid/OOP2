@@ -69,7 +69,7 @@ namespace OOP2
         /// <returns>Возвращает код ответа.</returns>
         public ResponseCode OrderMoney(int Value)
         {
-            Console.WriteLine($"Обращение на выдачу: {Value}");
+            //Console.WriteLine("Обращение на выдачу: {0}", Value);
             object Locker = new object();
             lock (Locker)
             {
